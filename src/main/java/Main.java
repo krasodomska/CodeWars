@@ -42,11 +42,12 @@ public class Main {
         }
         List<List<String>> box = Arrays.stream(boxPlane).map(line -> Arrays.stream(line).collect(Collectors.toList())).collect(Collectors.toList());
         //make frame
+        createFrame(box);
         boxToLeft(box, false);
         box = trimRight(box);
         box.forEach(x -> {
             x.forEach(System.out::print);
-            System.out.println("|");
+            System.out.println();
         });
         return boxPlane;
     }
@@ -79,7 +80,20 @@ public class Main {
     static void createFrame(List<List<String>> box){
         for(int y = 0; y < box.size() -1; y ++){
             for(int x = 0; x <box.get(y).size() -1; x++){
-                if(box.get(y).get(x).matches("\d")){
+                if(box.get(y).get(x).matches("\\d*")){
+                    System.out.println("dupa");
+                    if(box.get(y +1).get(x).equals(" ")) box.get(y +1).set(x, "-");
+                    if(box.get(y -1).get(x).equals(" ")) box.get(y -1).set(x, "-");
+                    if(box.get(y).get(x + 1).equals(" ")) box.get(y).set(x +1 , "|");
+                    if(box.get(y).get(x -1).equals(" ")) box.get(y).set(x -1, "|");
+                }
+            }
+        }
+        for(int y = 0; y < box.size() -1; y ++){
+            for(int x = 0; x <box.get(y).size() -1; x++){
+                if(box.get(y).get(x).matches("\\d*")){
+                    System.out.println("dupa");
+                    if
                 }
             }
         }
