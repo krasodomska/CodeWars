@@ -9,14 +9,14 @@ public class Main {
         String a = String.join("\n", new String[]
                 {
                         "+---+------------+---+",
-                        "|   |            |   |",
+                        "|                    |",
                         "+---+------------+---+",
                         "|   |            |   |",
                         "|   |            |   |",
                         "|   |            |   |",
                         "|   |            |   |",
-                        "+---+------------+---+",
-                        "|   |            |   |",
+                        "+   +------------+   +",
+                        "|                    |",
                         "+---+------------+---+"
                 });
         String b = String.join("\n", new String[]
@@ -33,7 +33,7 @@ public class Main {
 "+-----------------+"
                 });
         System.out.println("frames");
-        for(String frame : process(b)){
+        for(String frame : process(a)){
             System.out.println(frame);
         }
         System.out.println("table");
@@ -64,11 +64,9 @@ public class Main {
             boxPlane[place.y][place.x] = "" + color;
         }
         List<List<String>> box = Arrays.stream(boxPlane).map(line -> Arrays.stream(line).collect(Collectors.toList())).collect(Collectors.toList());
-        //make frame
         createFrame(box);
         boxToLeft(box, false);
         box = trimRight(box);
-
         return box.stream().map(line -> line.stream().map(letter -> {
                     if (letter.matches("\\d*")) {
                         return " ";
@@ -96,6 +94,7 @@ public class Main {
             {
                 for (int i = line.size() - 1; i >= 0; i--) {
                     if (line.get(i).equals(" ")) line.remove(i);
+                    else break;
                 }
             }
         }
@@ -107,7 +106,8 @@ public class Main {
             for (int x = 0; x < box.get(y).size() - 1; x++) {
                 if (box.get(y).get(x).matches("\\d*")) {
                     if (box.get(y + 1).get(x).equals(" ")){
-                        if(box.get(y + 1).get(x - 1).matches("\\d")) box.get(y + 1).set(x, "+");
+                        if(box.get(y + 1).get(x - 1).matches("\\d") || box.get(y + 1).get(x + 1).matches("\\d") )
+                            box.get(y + 1).set(x, "+");
                         else box.get(y + 1).set(x, "-");
                     }
                     if (box.get(y - 1).get(x).equals(" ")) box.get(y - 1).set(x, "-");
@@ -115,7 +115,10 @@ public class Main {
                         if(box.get(y + 1).get(x + 1).matches("\\d")) box.get(y).set(x + 1, "+");
                         else box.get(y).set(x + 1, "|");
                     }
-                    if (box.get(y).get(x - 1).equals(" ")) box.get(y).set(x - 1, "|");
+                    if (box.get(y).get(x - 1).equals(" ")){
+                        if(box.get(y + 1).get(x - 1).matches("\\d")) box.get(y).set(x - 1, "+");
+                        else  box.get(y).set(x - 1, "|");
+                    }
                 }
             }
         }
