@@ -6,13 +6,36 @@ public class Main {
     public static HashMap<Integer, List<Place>> map = new HashMap<>();
 
     public static void main(String[] args) {
-        String a = String.join("\n", new String[]{"+-----+",
-                "|     |",
-                "+-----+",
-                "|   | |",
-                "+-----+"});
-
-        process(a);
+        String a = String.join("\n", new String[]
+                {
+                        "+---+------------+---+",
+                        "|   |            |   |",
+                        "+---+------------+---+",
+                        "|   |            |   |",
+                        "|   |            |   |",
+                        "|   |            |   |",
+                        "|   |            |   |",
+                        "+---+------------+---+",
+                        "|   |            |   |",
+                        "+---+------------+---+"
+                });
+        String b = String.join("\n", new String[]
+                {
+"+-----------------+",
+"|                 |",
+"|   +-------------+",
+"|   |              ",
+"|   |              ",
+"|   |              ",
+"|   +-------------+",
+"|                 |",
+"|                 |",
+"+-----------------+"
+                });
+        System.out.println("frames");
+        for(String frame : process(b)){
+            System.out.println(frame);
+        }
         System.out.println("table");
         splitString.forEach(x -> {
             x.forEach(System.out::print);
@@ -24,15 +47,15 @@ public class Main {
         splitString(shape);
         colorAllFreePlace();
         deleteBackground();
-        createBox(2);
-        return new String[]{"+-----+",
-                "|     |",
-                "|     |",
-                "+-----+"};
-        // complete me!
+        List<String> finalList = new ArrayList<>();
+        map.keySet().forEach(color -> {
+            String frame = createBox(color);
+            finalList.add(frame);
+        });
+        return finalList.toArray(new String[finalList.size()]);
     }
 
-    static String[][] createBox(Integer color) {
+    static String createBox(Integer color) {
         String[][] boxPlane = new String[splitString.size()][splitString.get(0).size()];
         for (String[] line : boxPlane) {
             Arrays.fill(line, " ");
@@ -45,11 +68,13 @@ public class Main {
         createFrame(box);
         boxToLeft(box, false);
         box = trimRight(box);
-        box.forEach(x -> {
-            x.forEach(System.out::print);
-            System.out.println();
-        });
-        return boxPlane;
+
+        return box.stream().map(line -> line.stream().map(letter -> {
+                    if (letter.matches("\\d*")) {
+                        return " ";
+                    } else return letter;
+                }
+        ).collect(Collectors.joining())).collect(Collectors.joining("\n"));
     }
 
     static List<List<String>> boxToLeft(List<List<String>> box, boolean leftAlign) {
@@ -77,23 +102,30 @@ public class Main {
         return box.stream().filter(line -> line.size() > 0).collect(Collectors.toList());
     }
 
-    static void createFrame(List<List<String>> box){
-        for(int y = 0; y < box.size() -1; y ++){
-            for(int x = 0; x <box.get(y).size() -1; x++){
-                if(box.get(y).get(x).matches("\\d*")){
-                    System.out.println("dupa");
-                    if(box.get(y +1).get(x).equals(" ")) box.get(y +1).set(x, "-");
-                    if(box.get(y -1).get(x).equals(" ")) box.get(y -1).set(x, "-");
-                    if(box.get(y).get(x + 1).equals(" ")) box.get(y).set(x +1 , "|");
-                    if(box.get(y).get(x -1).equals(" ")) box.get(y).set(x -1, "|");
+    static void createFrame(List<List<String>> box) {
+        for (int y = 0; y < box.size() - 1; y++) {
+            for (int x = 0; x < box.get(y).size() - 1; x++) {
+                if (box.get(y).get(x).matches("\\d*")) {
+                    if (box.get(y + 1).get(x).equals(" ")){
+                        if(box.get(y + 1).get(x - 1).matches("\\d")) box.get(y + 1).set(x, "+");
+                        else box.get(y + 1).set(x, "-");
+                    }
+                    if (box.get(y - 1).get(x).equals(" ")) box.get(y - 1).set(x, "-");
+                    if (box.get(y).get(x + 1).equals(" ")){
+                        if(box.get(y + 1).get(x + 1).matches("\\d")) box.get(y).set(x + 1, "+");
+                        else box.get(y).set(x + 1, "|");
+                    }
+                    if (box.get(y).get(x - 1).equals(" ")) box.get(y).set(x - 1, "|");
                 }
             }
         }
-        for(int y = 0; y < box.size() -1; y ++){
-            for(int x = 0; x <box.get(y).size() -1; x++){
-                if(box.get(y).get(x).matches("\\d*")){
-                    System.out.println("dupa");
-                    if
+        for (int y = 0; y < box.size() - 1; y++) {
+            for (int x = 0; x < box.get(y).size() - 1; x++) {
+                if (box.get(y).get(x).matches("\\d*")) {
+                    if (box.get(y + 1).get(x + 1).equals(" ")) box.get(y + 1).set(x + 1, "+");
+                    if (box.get(y - 1).get(x - 1).equals(" ")) box.get(y - 1).set(x - 1, "+");
+                    if (box.get(y + 1).get(x - 1).equals(" ")) box.get(y + 1).set(x - 1, "+");
+                    if (box.get(y - 1).get(x + 1).equals(" ")) box.get(y - 1).set(x + 1, "+");
                 }
             }
         }
@@ -105,6 +137,7 @@ public class Main {
     }
 
     static void deleteBackground() {
+        HashSet<Integer> colorToDelete = new HashSet<>();
         for (Integer color : map.keySet()) {
             boolean amIBackground = false;
             for (Place place : map.get(color))
@@ -114,7 +147,10 @@ public class Main {
                     amIBackground = true;
                     break;
                 }
-            if (amIBackground) map.remove(color);
+            if (amIBackground) colorToDelete.add(color);
+        }
+        for (Integer color : colorToDelete) {
+            map.remove(color);
         }
 
     }
@@ -122,6 +158,7 @@ public class Main {
     static void colorAllFreePlace() {
         Place spacePlace = findSpace();
         Integer color = 1;
+        map.clear();
         while (spacePlace != null) {
             paintTheWorld(spacePlace, color);
             color++;
@@ -133,6 +170,7 @@ public class Main {
     static void paintTheWorld(Place place, Integer color) {
         splitString.get(place.y).set(place.x, color.toString());
 //         add to map
+
         if (map.containsKey(color)) {
             map.get(color).add(place);
         } else {
